@@ -1,5 +1,5 @@
 <body>
-    <h1>objファイルの読み取り</h1>
+    <h1>拡大縮小_問題</h1>
     <canvas id="canvas1" width="300" height="300"></canvas>
     <canvas id="canvas2" width="300" height="300"></canvas>
     <canvas id="canvas3" width="300" height="300"></canvas>
@@ -20,6 +20,7 @@
     const init = async() => {
         await load("./monkey.obj");
         Clear(ctx1);
+        Clear(ctx2);
         /* 面を一つづつ取り出す */
         for(f of F){
             for(let i=0; i<f.length; i++){
@@ -30,6 +31,12 @@
                 const vj = V[f[j]];
 
                 Line(ctx1, vi[0], vi[1], vj[0], vj[1]);
+
+                /* V_2を 1.5倍 にしてみよう */
+                const vi_2 = [vi[0], vi[1], vi[2]];
+                const vj_2 = [vj[0], vj[1], vj[2]];
+
+                Line(ctx2, vi_2[0], vi_2[1], vj_2[0], vj_2[1]);
             }
         }
     }
