@@ -1,0 +1,36 @@
+<body>
+    <h1>Canvasを使ってみよう</h1>
+    <canvas id="canvas1" width="300" height="300"></canvas>
+    <canvas id="canvas2" width="300" height="300"></canvas>
+    <canvas id="canvas3" width="300" height="300"></canvas>
+</body>
+<script>
+// ↓↓↓↓↓↓↓↓↓↓　コピペOK　↓↓↓↓↓↓↓↓↓↓
+    const can1 = document.getElementById("canvas1");
+    const ctx1 = can1.getContext("2d");
+    const can2 = document.getElementById("canvas2");
+    const ctx2 = can2.getContext("2d");
+    const can3 = document.getElementById("canvas3");
+    const ctx3 = can3.getContext("2d");
+// ↑↑↑↑↑↑↑↑↑↑　　　　　　↑↑↑↑↑↑↑↑↑↑
+
+    Clear(ctx1);
+    Line(ctx1, 1, 1, -1, -1);
+
+// ↓↓↓↓↓↓↓↓↓↓　コピペOK　↓↓↓↓↓↓↓↓↓↓
+    function Clear(ctx) {
+        ctx.rect(0,0,300,300);
+        ctx.fillStyle = "black";
+        ctx.fill()
+    }
+    function Line(ctx, x1, y1, x2, y2) {
+        const calc = (x) => 150 + x * 70;
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(calc(x1), calc(-1 * y1));
+        ctx.lineTo(calc(x2), calc(-1 * y2));
+        ctx.stroke();
+    }
+// ↑↑↑↑↑↑↑↑↑↑　　　　　　↑↑↑↑↑↑↑↑↑↑
+</script>
