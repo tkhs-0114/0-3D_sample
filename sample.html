@@ -1,5 +1,5 @@
 <body>
-    <h1>点情報と面情報</h1>
+    <h1>平行投影</h1>
     <canvas id="canvas1" width="300" height="300"></canvas>
     <canvas id="canvas2" width="300" height="300"></canvas>
     <canvas id="canvas3" width="300" height="300"></canvas>
@@ -47,7 +47,7 @@
             const vi = V[f[i]];
             const vj = V[f[j]];
 
-            console.log(vi, vj);
+            Line(ctx1, vi[0], vi[1], vj[0], vj[1]);
         }
     }
 
