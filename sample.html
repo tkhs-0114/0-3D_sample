@@ -1,5 +1,5 @@
 <body>
-    <h1>移動_問題</h1>
+    <h1>移動_答え</h1>
     <canvas id="canvas1" width="300" height="300"></canvas>
     <canvas id="canvas2" width="300" height="300"></canvas>
     <canvas id="canvas3" width="300" height="300"></canvas>
@@ -50,14 +50,14 @@
 
                 /* V_3を (1, 1, 1)の点 に移動してみよう */
                 const vi_3 = [
-                    [vi_2[0][0]],
-                    [vi_2[1][0]],
-                    [vi_2[2][0]]
+                    [vi_2[0][0] + 1],
+                    [vi_2[1][0] + 1],
+                    [vi_2[2][0] + 1]
                 ];
                 const vj_3 = [
-                    [vj_2[0][0]],
-                    [vj_2[1][0]],
-                    [vj_2[2][0]]
+                    [vj_2[0][0] + 1],
+                    [vj_2[1][0] + 1],
+                    [vj_2[2][0] + 1]
                 ];
 
                 Line(ctx3, vi_3[0][0], vi_3[1][0], vj_3[0][0], vj_3[1][0]);
