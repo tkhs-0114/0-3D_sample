@@ -1,5 +1,5 @@
 <body>
-    <h1>拡大縮小_答え</h1>
+    <h1>拡大縮小の行列</h1>
     <canvas id="canvas1" width="300" height="300"></canvas>
     <canvas id="canvas2" width="300" height="300"></canvas>
     <canvas id="canvas3" width="300" height="300"></canvas>
@@ -30,18 +30,35 @@
                 const vi = V[f[i]];
                 const vj = V[f[j]];
 
-                Line(ctx1, vi[0], vi[1], vj[0], vj[1]);
+                Line(ctx1, vi[0][0], vi[1][0], vj[0][0], vj[1][0]);
 
                 /* V_2を 1.5倍 にしてみよう */
-                const vi_2 = [vi[0] * 1.5, vi[1] * 1.5, vi[2] * 1.5];
-                const vj_2 = [vj[0] * 1.5, vj[1] * 1.5, vj[2] * 1.5];
+                let s = 1.5;
+                const vi_2 = mult3x1([
+                    [s, 0, 0],
+                    [0, s, 0],
+                    [0, 0, s]
+                ], vi);
+                const vj_2 = mult3x1([
+                    [s, 0, 0],
+                    [0, s, 0],
+                    [0, 0, s]
+                ], vj);
 
-                Line(ctx2, vi_2[0], vi_2[1], vj_2[0], vj_2[1]);
+                Line(ctx2, vi_2[0][0], vi_2[1][0], vj_2[0][0], vj_2[1][0]);
             }
         }
     }
     init();
 
+    function mult3x1(A, v){
+        const Av = [
+            [A[0][0] * v[0][0] + A[0][1] * v[1][0] + A[0][2] * v[2][0]],
+            [A[1][0] * v[0][0] + A[1][1] * v[1][0] + A[1][2] * v[2][0]],
+            [A[2][0] * v[0][0] + A[2][1] * v[1][0] + A[2][2] * v[2][0]]
+        ];
+        return Av;
+    }
 // ↓↓↓↓↓↓↓↓↓↓　コピペOK　↓↓↓↓↓↓↓↓↓↓
     async function load(filePath) {
         const response = await fetch(filePath);
@@ -52,7 +69,12 @@
             line = line.trim();
             if (line.startsWith("v ")) {
                 const [, x, y, z] = line.split(/\s+/).map(Number);
-                V.push([x, y, z]);
+                /* 列優先の書き方にする */
+                V.push([
+                    [x],
+                    [y],
+                    [z]
+                ]);
             } else if (line.startsWith("f ")) {
                 const [, ...indices] = line.split(/\s+/).map(i => parseInt(i) - 1);
                 F.push(indices);
