@@ -1,5 +1,5 @@
 <body>
-    <h1>Canvasを使ってみよう</h1>
+    <h1>点情報と面情報</h1>
     <canvas id="canvas1" width="300" height="300"></canvas>
     <canvas id="canvas2" width="300" height="300"></canvas>
     <canvas id="canvas3" width="300" height="300"></canvas>
@@ -14,8 +14,42 @@
     const ctx3 = can3.getContext("2d");
 // ↑↑↑↑↑↑↑↑↑↑　　　　　　↑↑↑↑↑↑↑↑↑↑
 
+// ↓↓↓↓↓↓↓↓↓↓　コピペOK　↓↓↓↓↓↓↓↓↓↓
+    /* 点情報 */
+    V = [
+        [-1, -1, -1], // Vertex 0
+        [1, -1, -1],  // Vertex 1
+        [1, 1, -1],   // Vertex 2
+        [-1, 1, -1],  // Vertex 3
+        [-1, -1, 1],  // Vertex 4
+        [1, -1, 1],   // Vertex 5
+        [1, 1, 1],    // Vertex 6
+        [-1, 1, 1]    // Vertex 7
+    ];
+    /* 面情報 */
+    F = [
+        [0, 1, 2, 3], // Front face　<-Front は頂点番号が0, 1, 2, 3の4点を結んだ面
+        [4, 5, 6, 7], // Back face
+        [0, 1, 5, 4], // Bottom face
+        [2, 3, 7, 6], // Top face
+        [0, 3, 7, 4], // Left face
+        [1, 2, 6, 5]  // Right face
+    ];
+// ↑↑↑↑↑↑↑↑↑↑　　　　　　↑↑↑↑↑↑↑↑↑↑
+
     Clear(ctx1);
-    Line(ctx1, 1, 1, -1, -1);
+    /* 面を一つづつ取り出す */
+    for(f of F){
+        for(let i=0; i<f.length; i++){
+            let j = (i+1) % f.length;
+
+            /* 面を構成する頂点 vi と vj */
+            const vi = V[f[i]];
+            const vj = V[f[j]];
+
+            console.log(vi, vj);
+        }
+    }
 
 // ↓↓↓↓↓↓↓↓↓↓　コピペOK　↓↓↓↓↓↓↓↓↓↓
     function Clear(ctx) {
