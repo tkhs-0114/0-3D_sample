@@ -1,5 +1,5 @@
 <body>
-    <h1>拡大縮小_問題</h1>
+    <h1>拡大縮小_答え</h1>
     <canvas id="canvas1" width="300" height="300"></canvas>
     <canvas id="canvas2" width="300" height="300"></canvas>
     <canvas id="canvas3" width="300" height="300"></canvas>
@@ -33,8 +33,8 @@
                 Line(ctx1, vi[0], vi[1], vj[0], vj[1]);
 
                 /* V_2を 1.5倍 にしてみよう */
-                const vi_2 = [vi[0], vi[1], vi[2]];
-                const vj_2 = [vj[0], vj[1], vj[2]];
+                const vi_2 = [vi[0] * 1.5, vi[1] * 1.5, vi[2] * 1.5];
+                const vj_2 = [vj[0] * 1.5, vj[1] * 1.5, vj[2] * 1.5];
 
                 Line(ctx2, vi_2[0], vi_2[1], vj_2[0], vj_2[1]);
             }
