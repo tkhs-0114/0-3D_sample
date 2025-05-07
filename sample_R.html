@@ -1,5 +1,5 @@
 <body>
-    <h1>Z軸回転_行列</h1>
+    <h1>XYZ軸回転_行列</h1>
     <canvas id="canvas1" width="300" height="300"></canvas>
     <canvas id="canvas2" width="300" height="300"></canvas>
     <canvas id="canvas3" width="300" height="300"></canvas>
@@ -20,6 +20,7 @@
         let theta = 0;
         let s = 1.5;
         let p = [1, 1, 1];
+        let r = [0, 0, 0];
         setInterval(() => {
             Clear(ctx1);
             Clear(ctx2);
@@ -34,12 +35,32 @@
 
                     Line(ctx1, vi[0][0], vi[1][0], vj[0][0], vj[1][0]);
                     
-                    const matrix = [
-                        [Math.cos(theta), -1 * Math.sin(theta), 0, p[0]],
-                        [Math.sin(theta), Math.cos(theta), 0, p[1]],
-                        [0, 0, 1, p[2]],
+                    r[0] = theta;
+                    r[1] = theta;
+                    r[2] = theta;
+                    const Rx = [
+                        [1, 0, 0, 0],
+                        [0, Math.cos(r[0]), -1 * Math.sin(r[0]), 0],
+                        [0, Math.sin(r[0]), Math.cos(r[0]), 0],
                         [0, 0, 0, 1]
-                    ]
+                    ];
+                    const Ry = [
+                        [Math.cos(r[1]), 0, Math.sin(r[1]), 0],
+                        [0, 1, 0, 0],
+                        [-1 * Math.sin(r[1]), 0, Math.cos(r[1]), 0],
+                        [0, 0, 0, 1]
+                    ];
+                    const Rz = [
+                        [Math.cos(r[2]), -1 * Math.sin(r[2]), 0, 0],
+                        [Math.sin(r[2]), Math.cos(r[2]), 0, 0],
+                        [0, 0, 1, 0],
+                        [0, 0, 0, 1]
+                    ];
+                    
+                    const matrix = mult4x4(
+                        mult4x4(Ry, Rx),
+                        Rz
+                    );
                     
                     const vi_2 = mult4x1(matrix, vi);
                     const vj_2 = mult4x1(matrix, vj);
