@@ -33,12 +33,10 @@
                     const vj = V[f[j]];
 
                     Line(ctx1, vi[0][0], vi[1][0], vj[0][0], vj[1][0]);
-
-                    p[0] = theta;
                     
                     const matrix = [
-                        [1, 0, 0, p[0]],
-                        [0, 1, 0, p[1]],
+                        [Math.cos(theta), -1 * Math.sin(theta), 0, p[0]],
+                        [Math.sin(theta), Math.cos(theta), 0, p[1]],
                         [0, 0, 1, p[2]],
                         [0, 0, 0, 1]
                     ]
