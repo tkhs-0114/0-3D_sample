@@ -1,0 +1,258 @@
+<body>
+    <h1>最終完成品</h1>
+    <canvas id="canvas1" width="300" height="300"></canvas>
+    <canvas id="canvas2" width="300" height="300"></canvas>
+    <canvas id="canvas3" width="300" height="300"></canvas>
+</body>
+<script>
+    const can1 = document.getElementById("canvas1");
+    const ctx1 = can1.getContext("2d");
+    const can2 = document.getElementById("canvas2");
+    const ctx2 = can2.getContext("2d");
+    const can3 = document.getElementById("canvas3");
+    const ctx3 = can3.getContext("2d");
+
+    const VAirplane = [];
+    const FAirplane = [];
+
+    const VPropeller = [];
+    const FPropeller = [];
+
+    const init = async() => {
+        await load("./airplane.obj", VAirplane, FAirplane);
+        await load("./propeller.obj", VPropeller, FPropeller);
+        let theta = 0;
+        let Airplane_position = [0, 0, 0];
+        let Airplane_rotation = [0, 0, 0.3];
+
+        let Propeller_position = [0, 0, 0];
+        let Propeller_rotation = [0, 0, 0];
+
+        let pCamera = [0, 0, 15];
+        let rCamera = [0, 0, 0];
+
+        setInterval(() => {
+            Clear(ctx1);
+
+            Airplane_rotation[1] = theta;
+            pCamera[0] = 5 * Math.sin(theta*2);
+            pCamera[2] = 5 * Math.cos(theta*2)+15;
+            // プロペラを回転させよう...プロペラはどの軸を中心に回転するのか...?
+            Propeller_rotation[/*？*/ 3 /*？*/] = theta* 30;
+
+            const Airplane_matrix_transform = transform(Airplane_position, Airplane_rotation);
+            const Propeller_matrix_transform = transform(Propeller_position, Propeller_rotation);
+            const Camera_matrix = transform(pCamera, rCamera);
+            const Camera_matrix_inverse = inverse4(Camera_matrix);
+            const Airplane_matrix = mult4x4(Camera_matrix_inverse, Airplane_matrix_transform);
+            // プロペラの行列　やりたいこと、
+            //                  プロペラを回転させる！
+            //                  飛行機と一緒に回転させる!
+            //                  ビュー空間にする！
+            const Propeller_matrix = /*？*/ Propeller_matrix_transform /*？*/;
+
+            for(f of FAirplane){
+                for(let i=0; i<f.length; i++){
+                    let j = (i+1) % f.length;
+                    
+                    const vi = mult4x1(Airplane_matrix, VAirplane[f[i]]);
+                    const vj = mult4x1(Airplane_matrix, VAirplane[f[j]]);
+
+                    const [xi, yi, zi] = [vi[0][0], vi[1][0], vi[2][0]];
+                    const [xj, yj, zj] = [vj[0][0], vj[1][0], vj[2][0]];
+
+                    Line(ctx1,
+                        -2 * xi / zi, -2 * yi / zi,
+                        -2 * xj / zj, -2 * yj / zj
+                    );
+                }
+            }
+            for(f of FPropeller){
+                for(let i=0; i<f.length; i++){
+                    let j = (i+1) % f.length;
+                    
+                    const vi = mult4x1(Propeller_matrix, VPropeller[f[i]]);
+                    const vj = mult4x1(Propeller_matrix, VPropeller[f[j]]);
+
+                    const [xi, yi, zi] = [vi[0][0], vi[1][0], vi[2][0]];
+                    const [xj, yj, zj] = [vj[0][0], vj[1][0], vj[2][0]];
+
+                    Line(ctx1,
+                        -2 * xi / zi, -2 * yi / zi,
+                        -2 * xj / zj, -2 * yj / zj
+                    );
+                }
+            }
+            theta += 0.01;
+            theta = theta % (Math.PI * 2);
+        }, 1000 / 30);
+        
+    }
+    init();
+
+    /*
+    関数の説明
+    mult4x4(A, B) : 4x4行列Aと4x4行列Bの積を計算する関数
+    inverse4(A) : 4x4行列Aの逆行列を計算する関数
+    mult4x1(A, v) : 4x4行列Aと4x1ベクトルvの積を計算する関数
+
+    transform(p, r) : 平行移動ベクトルpと回転ベクトルrを使って、変換行列を計算する関数
+    */
+
+    function mult3x1(A, v){
+        const Av = [
+            [A[0][0] * v[0][0] + A[0][1] * v[1][0] + A[0][2] * v[2][0]],
+            [A[1][0] * v[0][0] + A[1][1] * v[1][0] + A[1][2] * v[2][0]],
+            [A[2][0] * v[0][0] + A[2][1] * v[1][0] + A[2][2] * v[2][0]]
+        ];
+        return Av;
+    }
+    function mult4x4(A, B) {
+        const AB = [
+            [A[0][0] * B[0][0] + A[0][1] * B[1][0] + A[0][2] * B[2][0] + A[0][3] * B[3][0], 
+             A[0][0] * B[0][1] + A[0][1] * B[1][1] + A[0][2] * B[2][1] + A[0][3] * B[3][1], 
+             A[0][0] * B[0][2] + A[0][1] * B[1][2] + A[0][2] * B[2][2] + A[0][3] * B[3][2], 
+             A[0][0] * B[0][3] + A[0][1] * B[1][3] + A[0][2] * B[2][3] + A[0][3] * B[3][3]],
+            [A[1][0] * B[0][0] + A[1][1] * B[1][0] + A[1][2] * B[2][0] + A[1][3] * B[3][0],
+             A[1][0] * B[0][1] + A[1][1] * B[1][1] + A[1][2] * B[2][1] + A[1][3] * B[3][1], 
+             A[1][0] * B[0][2] + A[1][1] * B[1][2] + A[1][2] * B[2][2] + A[1][3] * B[3][2], 
+             A[1][0] * B[0][3] + A[1][1] * B[1][3] + A[1][2] * B[2][3] + A[1][3] * B[3][3]],
+            [A[2][0] * B[0][0] + A[2][1] * B[1][0] + A[2][2] * B[2][0] + A[2][3] * B[3][0],
+             A[2][0] * B[0][1] + A[2][1] * B[1][1] + A[2][2] * B[2][1] + A[2][3] * B[3][1], 
+             A[2][0] * B[0][2] + A[2][1] * B[1][2] + A[2][2] * B[2][2] + A[2][3] * B[3][2], 
+             A[2][0] * B[0][3] + A[2][1] * B[1][3] + A[2][2] * B[2][3] + A[2][3] * B[3][3]],
+            [A[3][0] * B[0][0] + A[3][1] * B[1][0] + A[3][2] * B[2][0] + A[3][3] * B[3][0],
+             A[3][0] * B[0][1] + A[3][1] * B[1][1] + A[3][2] * B[2][1] + A[3][3] * B[3][1], 
+             A[3][0] * B[0][2] + A[3][1] * B[1][2] + A[3][2] * B[2][2] + A[3][3] * B[3][2], 
+             A[3][0] * B[0][3] + A[3][1] * B[1][3] + A[3][2] * B[2][3] + A[3][3] * B[3][3]]
+        ];
+        return AB;
+    }
+    function mult4x1(A, v) {
+        const Av = [
+            [A[0][0] * v[0][0] + A[0][1] * v[1][0] + A[0][2] * v[2][0] + A[0][3] * v[3][0]],
+            [A[1][0] * v[0][0] + A[1][1] * v[1][0] + A[1][2] * v[2][0] + A[1][3] * v[3][0]],
+            [A[2][0] * v[0][0] + A[2][1] * v[1][0] + A[2][2] * v[2][0] + A[2][3] * v[3][0]],
+            [A[3][0] * v[0][0] + A[3][1] * v[1][0] + A[3][2] * v[2][0] + A[3][3] * v[3][0]]
+        ];
+        return Av;
+    }
+    function inverse4(A) {
+        // Create a 4x4 identity matrix
+        let I = [];
+        for (let i = 0; i < 4; i++) {
+            I[i] = [];
+            for (let j = 0; j < 4; j++) {
+                I[i][j] = (i === j) ? 1 : 0;
+            }
+        }
+
+        // Create a copy of A so we don't mutate the original
+        let M = A.map(row => row.slice());
+
+        // Forward elimination
+        for (let i = 0; i < 4; i++) {
+            // Find pivot
+            let maxRow = i;
+            for (let k = i + 1; k < 4; k++) {
+                if (Math.abs(M[k][i]) > Math.abs(M[maxRow][i])) {
+                    maxRow = k;
+                }
+            }
+
+            // Swap rows in M and I
+            [M[i], M[maxRow]] = [M[maxRow], M[i]];
+            [I[i], I[maxRow]] = [I[maxRow], I[i]];
+
+            let pivot = M[i][i];
+            if (pivot === 0) {
+                throw new Error("Matrix is singular and cannot be inverted.");
+            }
+
+            // Normalize pivot row
+            for (let j = 0; j < 4; j++) {
+                M[i][j] /= pivot;
+                I[i][j] /= pivot;
+            }
+
+            // Eliminate column
+            for (let k = 0; k < 4; k++) {
+                if (k !== i) {
+                    let factor = M[k][i];
+                    for (let j = 0; j < 4; j++) {
+                        M[k][j] -= factor * M[i][j];
+                        I[k][j] -= factor * I[i][j];
+                    }
+                }
+            }
+        }
+
+        return I;
+    }
+
+    function transform(p, r){
+        const Rx = [
+            [1, 0, 0, 0],
+            [0, Math.cos(r[0]), -1 * Math.sin(r[0]), 0],
+            [0, Math.sin(r[0]), Math.cos(r[0]), 0],
+            [0, 0, 0, 1]
+        ];
+        const Ry = [
+            [Math.cos(r[1]), 0, Math.sin(r[1]), 0],
+            [0, 1, 0, 0],
+            [-1 * Math.sin(r[1]), 0, Math.cos(r[1]), 0],
+            [0, 0, 0, 1]
+        ];
+        const Rz = [
+            [Math.cos(r[2]), -1 * Math.sin(r[2]), 0, 0],
+            [Math.sin(r[2]), Math.cos(r[2]), 0, 0],
+            [0, 0, 1, 0],
+            [0, 0, 0, 1]
+        ];
+        const P = [
+            [1, 0, 0, p[0]],
+            [0, 1, 0, p[1]],
+            [0, 0, 1, p[2]],
+            [0, 0, 0, 1]
+        ];
+        return mult4x4(mult4x4(P, Ry), mult4x4(Rx, Rz));
+    }
+
+    async function load(filePath, V, F) {
+        const response = await fetch(filePath);
+        const text = await response.text();
+        const lines = text.split("\n");
+
+        for (let line of lines) {
+            line = line.trim();
+            if (line.startsWith("v ")) {
+                const [, x, y, z] = line.split(/\s+/).map(Number);
+                /* 列優先の書き方にする */
+                /* 1 を追加する */
+                V.push([
+                    [x],
+                    [y],
+                    [z],
+                    [1]
+                ]);
+            } else if (line.startsWith("f ")) {
+                const [, ...indices] = line.split(/\s+/).map(i => parseInt(i) - 1);
+                F.push(indices);
+            }
+        }
+    }
+    function Clear(ctx) {
+        ctx.rect(0,0,300,300);
+        ctx.fillStyle = "black";
+        ctx.fill()
+    }
+    function Line(ctx, x1, y1, x2, y2) {
+        const calc = (x) => 150 + x * 70;
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(calc(x1), calc(-1 * y1));
+        ctx.lineTo(calc(x2), calc(-1 * y2));
+        ctx.stroke();
+    }
+</script>
